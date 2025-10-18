@@ -1,0 +1,304 @@
+<!-- 
+# ----- License -------------------------------------------------- #
+
+#  GlassGuard – GlassGuard is an open-source utility for authorized security testing, iframe inspection, and controlled target interaction in ethical environments.
+#  Copyright (c) 2025 - Steven Pereira aka Cursed.
+
+#  This software is an open-source cybersecurity tool developed for
+#  penetration testing, threat modeling, and security research. It   
+#  is licensed under the MIT License, allowing free use, modification, 
+#  and distribution under the following conditions:
+#
+#  You MUST include this copyright notice in all copies.
+#  You MAY use this software for personal or educational purposes ONLY.
+#  This software is provided "AS IS," WITHOUT WARRANTY of any kind. 
+#  You MAY NOT use this software for any illegal or unauthorized activity.
+
+#  DISCLAIMER:
+#  This tool is intended for **educational or ethical testing** purposes only.
+#  Unauthorized or malicious use of this software against systems without 
+#  proper authorization is strictly prohibited and may violate laws and regulations.
+#  The author assumes no liability for misuse or damage caused by this tool.
+
+#  🔗 License: MIT License
+#  🔗 Repository: https://github.com/Cursed271
+#  🔗 Author: Steven Pereira (@Cursed271)
+
+-->
+
+<!-- # ----- Clickjacking Script -------------------------------------- # -->
+
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+	<meta charset = "UTF-8"/>
+	<meta name = "viewport" content = "width = device-width, initial-scale = 1.0"/>
+	<title>GlassGuard Clickjacker</title>
+	<link rel = "icon" type = "image/png" href = "https://raw.githubusercontent.com/Cursed271/Cursed271/main/Logo.png">
+	<style>
+		:root {
+			--accent: #C6ECE3;
+			--bg: #262626;
+			--panel: #1f1f1f;
+			--section: #2b2b2b;
+			--log-success: #00ff00;
+			--log-warning: #ff4c4c;
+			--log-info: #B4D9CF;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		body {
+			background-color: var(--bg);
+			font-family: "JetBrains Mono", monospace;
+			color: #f1f1f1;
+			display: flex;
+			justify-content: center;
+			align-items: flex-start;
+			height: 100vh;
+			margin: 0;
+			padding: 20px;
+			gap: 20px;
+		}
+
+		.panel {
+			background: var(--panel);
+			border-radius: 16px;
+			padding: 20px;
+			box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+			width: 320px;
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+			height: calc(100vh - 40px);
+		}
+
+		.header {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+
+		.icon img {
+			width: 65px;
+			height: 65px;
+			object-fit: contain;
+			border-radius: 50%;
+		}
+
+		.title {
+			font-weight: 600;
+			font-size: 15px;
+			line-height: 1.2;
+		}
+
+		.section {
+			background: var(--section);
+			padding: 14px;
+			border-radius: 12px;
+			display: flex;
+			flex-direction: column;
+			gap: 10px;
+		}
+
+		input[type="text"] {
+			background: #1a1a1a;
+			border: none;
+			color: #f1f1f1;
+			padding: 10px;
+			border-radius: 8px;
+			width: 100%;
+			box-sizing: border-box;
+			outline: none;
+		}
+
+		.button-row {
+			display: flex;
+			justify-content: space-between;
+			gap: 10px;
+		}
+
+		button {
+			flex: 1;
+			padding: 10px;
+			border-radius: 8px;
+			border: none;
+			font-weight: 600;
+			cursor: pointer;
+			background-color: var(--accent);
+			color: #262626;
+			transition: background-color 0.3s;
+		}
+
+		.log {
+			background: var(--section);
+			border-radius: 12px;
+			padding: 12px;
+			font-family: monospace;
+			font-size: 12px;
+			white-space: normal;
+			overflow-y: auto;
+			overflow-wrap: break-word;
+			word-break: normal;
+		}
+
+		.success{
+			color: var(--log-success);
+		}
+
+		.warning{
+			color: var(--log-warning);
+		}
+
+		.info{
+			color: var(--log-info);
+		}
+
+		.notes {
+			font-size: 12px;
+			color: #aaa;
+			line-height: 1.4;
+		}
+
+		.social {
+			font-size: 12px;
+			color: #aaa;
+			line-height: 1.4;
+		}
+
+		.social a,
+		.social a:visited {
+			color: var(--log-info);
+			text-decoration: none;
+		}
+
+		.iframe-container {
+			background: var(--panel);
+			border-radius: 16px;
+			flex: 1;
+			min-width: 850px;
+			height: calc(100vh - 40px);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			overflow: hidden;
+			box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+		}
+
+		iframe {
+			width: 100%;
+			height: 100%;
+			border: none;
+			border-radius: 16px;
+		}
+
+		.panel > .section:nth-child(3){
+			min-height: 0;
+		}
+
+	</style>
+
+</head>
+
+<body>
+
+	<div class = "panel">
+		<div class = "header">
+			<div class = "icon">
+				<img src = "https://raw.githubusercontent.com/Cursed271/Cursed271/main/Logo.png">
+			</div>
+			<div class = "title">GlassGuard - Frame the Target. Guard the Access.</div>
+		</div>
+
+		<div class = "section">
+			<label>Target URL</label>
+			<input id = "targetURL" type = "text" placeholder = "https://cursedsec.com"/>
+			<div class = "button-row">
+				<button id = "loadBtn">Load Target</button>
+			</div>
+		</div>
+
+		<div class = "section" style = "flex: 1;">
+			<label>Activity Log</label>
+			<div id="log" class="log">
+				<div class="success">[+] GlassGuard is ready!</div>
+				<div class="success">[+] Enter a Target URL & Click "Load Target"</div>
+			</div>
+		</div>
+
+		<div class = "section">
+			<div class = "notes">
+				Notes:<br>
+				<ul>
+					<li>Use this script on systems that you have authorization to test.<br></li>
+					<li>This does not bypass iFrame Protections.<br></li>
+					<li>Created by Cursed271.</li>
+				</ul>
+			</div>
+		</div>
+
+		<div class = "section">
+			<div class = "social">
+				Follow me On:<br>
+				<ul>
+					<li>Github: <a href="https://github.com/Cursed271">@Cursed271</a><br></li>
+					<li>LinkedIn: <a href="https://www.linkedin.com/in/Cursed271">@Cursed271</a><br></li>
+					<li>Website: <a href="https://www.cursedsec.com">CursedSec.com</a></li>
+				</ul>
+			</div>
+		</div>
+
+	</div>
+
+	<div class = "iframe-container">
+		<iframe id = "targetFrame" sandbox = "allow-same-origin allow-scripts allow-forms"></iframe>
+	</div>
+
+	<script>
+		const loadBtn = document.getElementById("loadBtn");
+		const frame = document.getElementById("targetFrame");
+		const log = document.getElementById("log");
+		const targetURLInput = document.getElementById("targetURL");
+
+		targetURLInput.value = "";
+		frame.src = "about:blank";
+
+		function logMsg(msg, type = "info"){
+			const timestamp = new Date().toISOString().replace("T", " ").split(".")[0];
+			const entry = document.createElement("div");
+			let icon;
+			if (type === 'success') {
+					icon = '[+]';
+					entry.classList.add('success');
+				} else if (type === 'warning') {
+					icon = '[!]'; 
+					entry.classList.add('warning');
+				} else { 
+					icon = '[?]'; 
+					entry.classList.add('info');
+				}
+			entry.innerHTML = `${timestamp} — ${icon} ${msg}`;
+			log.appendChild(entry);
+			setTimeout(() => { log.scrollTop = log.scrollHeight; }, 0);
+		}
+
+		loadBtn.addEventListener("click", () => {
+			const url = document.getElementById("targetURL").value.trim();
+			if (!url) {
+				logMsg("Enter a valid URL.", "warning");
+				return;
+			}
+			frame.src = "about:blank";
+			logMsg(`Loading target: ${url}`, "info");
+			frame.src = url;
+        });
+
+	</script>
+
+</body>
+
+</html>
+
+<!-- # ----- End ------------------------------------------------------ # -->
